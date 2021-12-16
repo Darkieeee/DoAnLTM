@@ -1,8 +1,5 @@
 package connection;
-
-import connection.ServerTCP;
 import java.io.IOException;
-import java.lang.reflect.Executable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -10,7 +7,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Vector;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

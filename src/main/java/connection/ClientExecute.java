@@ -105,8 +105,8 @@ public class ClientExecute {
         if(isConnected)
         {
             try {
-                in.close();
                 out.close();
+                in.close();
                 socket.close();
             } catch(IOException e)
             {

@@ -48,32 +48,25 @@ public class ServerTCP implements Runnable {
                 }
             }
 
-           while (true) {
-               input = in.readLine();
-               input = Encryption.decryptData(sessionKey, input);
-               System.out.println("Server received: " + input + " from " + socket.toString() + " # Client " + myName);
-               for(ServerTCP server: ServerExecute.servers){
-                   if(myName.equals(server.myName)){
-                       String response = input.toUpperCase(); //response upper string input
-                       response = Encryption.encryptData(sessionKey, response); //encrypt data before send
-                       server.out.write(response+'\n');
-                       server.out.flush();
-                       System.out.println("Server write: " + response + " to " + server.myName);
-                       break;
-                   }
-               }
-           }
-        } catch (IOException e){
-            System.out.println("Client exit");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (NoSuchPaddingException e) {
-            e.printStackTrace();
-        } catch (BadPaddingException e) {
-            e.printStackTrace();
-        } catch (IllegalBlockSizeException e) {
+            while (true) {
+                input = in.readLine();
+                input = Encryption.decryptData(sessionKey, input);
+                System.out.println("Server received: " + input + " from " + socket.toString() + " # Client " + myName);
+                for(ServerTCP server: ServerExecute.servers){
+                    if(myName.equals(server.myName)){
+                        String response = input.toUpperCase(); //response upper string input
+                        response = Encryption.encryptData(sessionKey, response); //encrypt data before send
+                        server.out.write(response+'\n');
+                        server.out.flush();
+                        System.out.println("Server write: " + response + " to " + server.myName);
+                        break;
+                    }
+                }
+            }
+        } catch (IOException | NullPointerException e){
+            System.out.println("Client "+myName+" exit");
+            ServerExecute.servers.remove(this);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
             e.printStackTrace();
         }
     }

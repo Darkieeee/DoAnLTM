@@ -1,12 +1,25 @@
 package userinterface;
+import classes.ImageIconConverter;
+import classes.model.ChiTietMonHoc;
 import components.table.AttributiveCellTableModel;
 import components.table.MultiSpanCellTable;
 import components.table.AttributiveCellRenderer;
 import components.event.KeyListenerMoveRow;
+import components.table.DefaultCellAttribute;
 import components.table.TableHeaderRenderer;
 import connection.ClientExecute;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.SwingWorker;
 public class Main extends javax.swing.JFrame {
     private final MultiSpanCellTable tblLichhoc;
     private final ClientExecute client;
@@ -15,6 +28,7 @@ public class Main extends javax.swing.JFrame {
     public static final String[] dsThu = new String[]{"Thứ hai","Thứ ba","Thứ tư",
                                                       "Thứ năm","Thứ sáu","Thứ bảy",
                                                       "Chủ nhật"};
+    private ExecutorService ex = Executors.newFixedThreadPool(1);
     public Main() {
         initComponents();
         AttributiveCellTableModel table = new AttributiveCellTableModel(dsThu,14){
@@ -31,8 +45,13 @@ public class Main extends javax.swing.JFrame {
     }
     private void addOn()
     {
-        setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
-        setIconImage(new javax.swing.ImageIcon("src/main/resources/images/logoSGU.png").getImage());
+        //setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+        javax.swing.ImageIcon icon = ImageIconConverter.getScaledImage(new javax.swing.ImageIcon("src/main/resources/images/logoSGU.png"),400,400);
+        FrameDragListener frameDrag = new FrameDragListener(this);
+        setIconImage(icon.getImage());
+        getRootPane().setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+        addMouseListener(frameDrag);
+        addMouseMotionListener(frameDrag);
         /*--------------------Thiet ke lai Table-------------------*/
         
             tblTiethoc.getTableHeader().setPreferredSize(new java.awt.Dimension(
@@ -111,10 +130,6 @@ public class Main extends javax.swing.JFrame {
                 }
             });
     }
-    private void LoadingGIF()
-    {
-        //Do wait till the server responses back
-    }
     private void setReorderingColumn(javax.swing.JTable table, boolean allowReorder)
     {
         table.getTableHeader().setReorderingAllowed(allowReorder);
@@ -156,6 +171,9 @@ public class Main extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+        lblLogout = new javax.swing.JLabel();
+        lblMinimize = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -174,9 +192,6 @@ public class Main extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTiethoc = new javax.swing.JTable();
-        jPanel1 = new javax.swing.JPanel();
-        lblLogout = new javax.swing.JLabel();
-        lblMinimize = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Xếp thời khoá biểu SGU");
@@ -184,6 +199,53 @@ public class Main extends javax.swing.JFrame {
         setLocationByPlatform(true);
         setUndecorated(true);
         setResizable(false);
+
+        jPanel1.setBackground(new java.awt.Color(102, 153, 204));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1084, 50));
+
+        lblLogout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/close.png"))); // NOI18N
+        lblLogout.setToolTipText("Close");
+        lblLogout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lblLogout.setPreferredSize(new java.awt.Dimension(30, 30));
+        lblLogout.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblLogoutMouseClicked(evt);
+            }
+        });
+
+        lblMinimize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/minimize (2).png"))); // NOI18N
+        lblMinimize.setToolTipText("Minimize");
+        lblMinimize.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblMinimize.setDoubleBuffered(true);
+        lblMinimize.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblMinimizeMouseClicked(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(997, Short.MAX_VALUE)
+                .addComponent(lblMinimize, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
+                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(5, 5, 5)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblMinimize, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(5, 5, 5))
+        );
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -310,7 +372,7 @@ public class Main extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(36, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -397,58 +459,23 @@ public class Main extends javax.swing.JFrame {
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
-        jPanel1.setBackground(new java.awt.Color(102, 153, 204));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1084, 65));
-
-        lblLogout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/close.png"))); // NOI18N
-        lblLogout.setToolTipText("Close");
-        lblLogout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        lblLogout.setPreferredSize(new java.awt.Dimension(30, 30));
-        lblLogout.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblLogoutMouseClicked(evt);
-            }
-        });
-
-        lblMinimize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/minimize (2).png"))); // NOI18N
-        lblMinimize.setToolTipText("Minimize");
-        lblMinimize.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblMinimizeMouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(996, Short.MAX_VALUE)
-                .addComponent(lblMinimize, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblMinimize, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
-                    .addComponent(lblLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(14, Short.MAX_VALUE))
-        );
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
-
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnOption2ActionPerformed
+    private void lblLogoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLogoutMouseClicked
+        int confirmExit = javax.swing.JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thoát?", "Chương trình", javax.swing.JOptionPane.YES_NO_OPTION);
+        if(confirmExit == javax.swing.JOptionPane.YES_OPTION)
+        {
+            client.close();
+            ex.shutdown();
+            dispose();
+        }
+    }//GEN-LAST:event_lblLogoutMouseClicked
+
+    private void lblMinimizeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblMinimizeMouseClicked
+        this.setState(javax.swing.JFrame.ICONIFIED);
+    }//GEN-LAST:event_lblMinimizeMouseClicked
 
     private void btnOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption1ActionPerformed
         // TODO add your handling code here:
@@ -458,37 +485,45 @@ public class Main extends javax.swing.JFrame {
         if(!client.isConnected())
         {
             javax.swing.JOptionPane.showMessageDialog( null,
-                                                       "Không thể kết nối host/port của server",
-                                                       "Chương trình",
-                                                       javax.swing.JOptionPane.ERROR_MESSAGE);
+                "Không thể kết nối đến server",
+                "Chương trình",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-        
+
         else{
-            client.sendMessage("Hello Server");
-            String originalString = client.getMessage();
-            System.out.println(originalString);
+            String [] characters = new String[]{"a","b","c"};
+            java.util.Random rd = new java.util.Random();
+            client.sendMessage(characters[rd.nextInt(characters.length)]);
+            LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
+            SwingWorker<String,String> worker = new SwingWorker<>(){
+                @Override
+                protected String doInBackground() throws InterruptedException {
+                    Thread.sleep(1000);
+                    return client.getMessage();
+                }
+                @Override
+                protected void done() {
+                    try {
+                        System.out.println("What i get:" + get());
+                        ld.setVisible(false);
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            ex.submit(worker);
+            //Loading dialog will be displayed on the screen after the button has been clicked
+            ld.setVisible(true);
         }
     }//GEN-LAST:event_btnOption4ActionPerformed
+
+    private void btnOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnOption2ActionPerformed
 
     private void inpSubjectIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inpSubjectIDActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_inpSubjectIDActionPerformed
-
-    private void lblLogoutMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblLogoutMouseClicked
-        int confirmExit = javax.swing.JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn thoát?", "Chương trình", javax.swing.JOptionPane.YES_NO_OPTION);
-        if(confirmExit == javax.swing.JOptionPane.YES_OPTION)
-        {
-//            if(client.isConnected())
-//            {
-//                client.close();
-//            }
-            this.dispose();
-        }
-    }//GEN-LAST:event_lblLogoutMouseClicked
-
-    private void lblMinimizeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblMinimizeMouseClicked
-        this.setState(javax.swing.JFrame.ICONIFIED);
-    }//GEN-LAST:event_lblMinimizeMouseClicked
 
     /**
      * @param args the command line arguments
@@ -545,4 +580,47 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JTable tblMonhoc;
     private javax.swing.JTable tblTiethoc;
     // End of variables declaration//GEN-END:variables
+}
+class LoadingDialog extends JDialog {
+    public LoadingDialog(javax.swing.JFrame container, String title, String urlGIF)
+    {
+        super(container,title,true);
+        setLayout(new java.awt.BorderLayout());
+        JLabel label = new JLabel();
+        label.setHorizontalAlignment(JLabel.CENTER);
+        label.setVerticalAlignment(JLabel.CENTER);
+        javax.swing.ImageIcon getImgIcon = new javax.swing.ImageIcon(urlGIF);
+        javax.swing.ImageIcon imgicon = ImageIconConverter.getScaledImage(getImgIcon,300,300);
+        label.setIcon(imgicon);
+        add(label,java.awt.BorderLayout.CENTER);
+        pack();
+        setLocationRelativeTo(null);
+        setResizable(false);
+    }
+}
+class FrameDragListener extends MouseAdapter {
+    
+    /*Source: https://stackoverflow.com/questions/16046824/making-a-java-swing-frame-movable-and-setundecorated*/
+    private final javax.swing.JFrame container;
+    private java.awt.Point mouseDownCompCoords = null;
+    
+    public FrameDragListener(javax.swing.JFrame container) {
+        this.container = container;
+    }
+
+    @Override
+    public void mouseReleased(java.awt.event.MouseEvent e) {
+        mouseDownCompCoords = null;
+    }
+
+    @Override
+    public void mousePressed(java.awt.event.MouseEvent e) {
+        mouseDownCompCoords = e.getPoint();
+    }
+        
+    @Override
+    public void mouseDragged(java.awt.event.MouseEvent e) {
+        java.awt.Point currCoords = e.getLocationOnScreen();
+        container.setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
+    }
 }
