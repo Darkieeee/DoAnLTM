@@ -1,15 +1,16 @@
 package connection;
+import classes.connectDatabase.BLL.HocPhanBLL;
+import classes.model.HocPhan;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-
+import java.util.LinkedHashMap;
+import org.json.JSONObject;
 /**
  * @author Loan (^._.^)ﾉ
  */
@@ -21,11 +22,45 @@ public class ServerTCP implements Runnable {
     private SecretKey sessionKey;
     private String strSessionKey;
     private String original;
+    private final HocPhanBLL hocphanBLL = new HocPhanBLL(); // truy van CSDL hoc phan
     public ServerTCP(Socket socket, String name) throws IOException {
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         this.myName = name;
+    }
+    private String doCommand(String input){
+        String[] parseInput = input.split(";");
+        String result = null;
+        if(parseInput.length == 2)
+        {
+            switch(parseInput[0]){
+                case "REGISTERCOURSE":{
+                    HocPhan hocphan = hocphanBLL.getMaHocPhan(parseInput[1]);
+                    if(hocphan != null)
+                    {
+                        JSONObject resData = new JSONObject();
+                        resData.put("status", true);
+                        LinkedHashMap<String,String> hpData = new LinkedHashMap<>();
+                        hpData.put("mamh",hocphan.getMaMonHoc());
+                        hpData.put("tenmh",hocphan.getTenMonHoc());
+                        hpData.put("nhommh",hocphan.getNhomMonHoc());
+                        hpData.put("makhoa",hocphan.getMaKhoa());
+                        resData.put("hocphan", hpData);
+                        System.out.println(resData.toString());
+                        result = resData.toString();
+                    }
+                    else {
+                        JSONObject resData = new JSONObject();
+                        resData.put("status", false);
+                        resData.put("message", "Không tìm thấy mã học phần trong học kì này");
+                        result = resData.toString();
+                    }
+                }
+                break;
+            }
+        }
+        return result;
     }
     @Override
     public void run() {
@@ -54,7 +89,7 @@ public class ServerTCP implements Runnable {
                 System.out.println("Server received: " + input + " from " + socket.toString() + " # Client " + myName);
                 for(ServerTCP server: ServerExecute.servers){
                     if(myName.equals(server.myName)){
-                        String response = input.toUpperCase(); //response upper string input
+                        String response = doCommand(input);
                         response = Encryption.encryptData(sessionKey, response); //encrypt data before send
                         server.out.write(response+'\n');
                         server.out.flush();

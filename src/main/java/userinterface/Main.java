@@ -1,25 +1,21 @@
 package userinterface;
 import classes.ImageIconConverter;
-import classes.model.ChiTietMonHoc;
+import classes.model.HocPhan;
+import com.google.gson.Gson;
 import components.table.AttributiveCellTableModel;
 import components.table.MultiSpanCellTable;
 import components.table.AttributiveCellRenderer;
 import components.event.KeyListenerMoveRow;
-import components.table.DefaultCellAttribute;
 import components.table.TableHeaderRenderer;
 import connection.ClientExecute;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.SwingWorker;
+import org.json.JSONObject;
 public class Main extends javax.swing.JFrame {
     private final MultiSpanCellTable tblLichhoc;
     private final ClientExecute client;
@@ -270,10 +266,15 @@ public class Main extends javax.swing.JFrame {
         btnTenMonHoc.setText("Chọn");
 
         btnMaMonHoc.setText("Chọn");
+        btnMaMonHoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMaMonHocActionPerformed(evt);
+            }
+        });
 
         tblMonhoc.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                { new Integer(1), null, null}
+
             },
             new String [] {
                 "Độ ưu tiên", "Mã MH", "Tên môn học"
@@ -372,13 +373,12 @@ public class Main extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(21, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 938, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 938, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -409,25 +409,22 @@ public class Main extends javax.swing.JFrame {
                                             .addComponent(btnOption2)
                                             .addComponent(btnOption4))
                                         .addGap(37, 37, 37)))
-                                .addGap(89, 89, 89))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jLabel1)
-                                .addGap(204, 204, 204)))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(110, 110, 110))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(inpSubjectID, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnMaMonHoc, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -449,7 +446,8 @@ public class Main extends javax.swing.JFrame {
                                     .addComponent(btnOption4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(31, 31, 31)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(20, 20, 20)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -491,9 +489,6 @@ public class Main extends javax.swing.JFrame {
         }
 
         else{
-            String [] characters = new String[]{"a","b","c"};
-            java.util.Random rd = new java.util.Random();
-            client.sendMessage(characters[rd.nextInt(characters.length)]);
             LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
             SwingWorker<String,String> worker = new SwingWorker<>(){
                 @Override
@@ -503,12 +498,7 @@ public class Main extends javax.swing.JFrame {
                 }
                 @Override
                 protected void done() {
-                    try {
-                        System.out.println("What i get:" + get());
-                        ld.setVisible(false);
-                    } catch (InterruptedException | ExecutionException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    ld.setVisible(false);
                 }
             };
             ex.submit(worker);
@@ -524,6 +514,38 @@ public class Main extends javax.swing.JFrame {
     private void inpSubjectIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inpSubjectIDActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_inpSubjectIDActionPerformed
+    /*Đăng ký môn học theo mã*/
+    private void btnMaMonHocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaMonHocActionPerformed
+        if(inpSubjectID.toString() == null || inpSubjectID.toString().equals(""))
+        {
+            return;
+        }
+        if(client.isConnected())
+        {
+            client.sendMessage("REGISTERCOURSE;"+inpSubjectID.getText());
+            String json = client.getMessage();
+            JSONObject getData = new JSONObject(json);
+            if(getData.getBoolean("status"))
+            {
+                HocPhan hocphan = new Gson().fromJson(getData.getJSONObject("hocphan").toString(),HocPhan.class);
+                javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblMonhoc.getModel();
+                model.addRow(new Object[]{tblMonhoc.getRowCount()+1,
+                                          hocphan.getMaMonHoc(),
+                                          hocphan.getTenMonHoc()});
+            }
+            else {
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                                                          getData.get("message"),
+                                                          "Chương trình",
+                                                          javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            }
+        }else{
+            javax.swing.JOptionPane.showMessageDialog(null,
+                                                      "Không thể kết nối đến server",
+                                                      "Chương trình",
+                                                      javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnMaMonHocActionPerformed
 
     /**
      * @param args the command line arguments
