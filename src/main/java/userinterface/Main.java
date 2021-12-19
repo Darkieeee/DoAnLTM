@@ -73,6 +73,7 @@ public class Main extends javax.swing.JFrame {
             setHeaderCellStyle(tblLichhoc, background, foreground, textFont);
             setHeaderCellStyle(tblMonhoc,background,foreground, textFont);
             setCenteredAlignmentTableBodyCell(tblTiethoc);
+            setCenteredAlignmentTableBodyCell(tblMonhoc,1,tblMonhoc.getColumnCount());
             tblLichhoc.setRowHeight(25);
             setReorderingColumn(tblMonhoc, false);
             setMyCellStyle(tblLichhoc);
@@ -163,6 +164,19 @@ public class Main extends javax.swing.JFrame {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
     }
+    private void setCenteredAlignmentTableBodyCell(javax.swing.JTable table,int start, int end){
+        if(start > end)
+        {
+            return;
+        }
+        javax.swing.table.DefaultTableCellRenderer centerRenderer = new javax.swing.table.DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(javax.swing.JLabel.CENTER);
+        for(int i=start;i<end;i++)
+        {
+            table.getColumnModel().getColumn(i).setResizable(false);
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+    }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -188,6 +202,7 @@ public class Main extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTiethoc = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Xếp thời khoá biểu SGU");
@@ -277,14 +292,14 @@ public class Main extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Độ ưu tiên", "Mã MH", "Tên môn học"
+                "", "STT", "Mã MH", "Tên môn học"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                java.lang.Boolean.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                true, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -297,7 +312,15 @@ public class Main extends javax.swing.JFrame {
         });
         tblMonhoc.setRowHeight(24);
         tblMonhoc.setShowGrid(true);
+        tblMonhoc.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tblMonhoc);
+        if (tblMonhoc.getColumnModel().getColumnCount() > 0) {
+            tblMonhoc.getColumnModel().getColumn(0).setResizable(false);
+            tblMonhoc.getColumnModel().getColumn(0).setPreferredWidth(2);
+            tblMonhoc.getColumnModel().getColumn(1).setResizable(false);
+            tblMonhoc.getColumnModel().getColumn(1).setPreferredWidth(5);
+            tblMonhoc.getColumnModel().getColumn(2).setPreferredWidth(10);
+        }
 
         btnOption2.setText("Số ngày học ít nhất");
         btnOption2.addActionListener(new java.awt.event.ActionListener() {
@@ -368,6 +391,13 @@ public class Main extends javax.swing.JFrame {
         tblTiethoc.setShowGrid(true);
         jScrollPane2.setViewportView(tblTiethoc);
 
+        jButton1.setText("Xoá các môn được chọn");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -375,10 +405,6 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap(21, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 938, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel3Layout.createSequentialGroup()
@@ -409,12 +435,20 @@ public class Main extends javax.swing.JFrame {
                                             .addComponent(btnOption2)
                                             .addComponent(btnOption4))
                                         .addGap(37, 37, 37)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(100, 100, 100))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(214, 214, 214)))
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 356, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addGap(109, 109, 109))))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 938, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(49, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -446,9 +480,13 @@ public class Main extends javax.swing.JFrame {
                                     .addComponent(btnOption4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addGap(31, 31, 31)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(20, 20, 20))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -514,7 +552,7 @@ public class Main extends javax.swing.JFrame {
     private void inpSubjectIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inpSubjectIDActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_inpSubjectIDActionPerformed
-    /*Đăng ký môn học theo mã*/
+
     private void btnMaMonHocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaMonHocActionPerformed
         if(inpSubjectID.toString() == null || inpSubjectID.toString().equals(""))
         {
@@ -529,9 +567,11 @@ public class Main extends javax.swing.JFrame {
             {
                 HocPhan hocphan = new Gson().fromJson(getData.getJSONObject("hocphan").toString(),HocPhan.class);
                 javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblMonhoc.getModel();
-                model.addRow(new Object[]{tblMonhoc.getRowCount()+1,
+                model.addRow(new Object[]{false,
+                                          tblMonhoc.getRowCount()+1,
                                           hocphan.getMaMonHoc(),
                                           hocphan.getTenMonHoc()});
+                javax.swing.JOptionPane.showMessageDialog(null,"Chọn môn thành công","Chương trình",javax.swing.JOptionPane.PLAIN_MESSAGE);
             }
             else {
                 javax.swing.JOptionPane.showMessageDialog(null, 
@@ -546,6 +586,10 @@ public class Main extends javax.swing.JFrame {
                                                       javax.swing.JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnMaMonHocActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -588,6 +632,7 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton btnTenMonHoc;
     private javax.swing.JTextField inpSubjectID;
     private javax.swing.JTextField inpSubjectName;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
