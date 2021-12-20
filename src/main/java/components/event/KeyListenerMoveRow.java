@@ -58,10 +58,10 @@ public class KeyListenerMoveRow implements KeyListener{
         }
         model.moveRow(rows[0], rows[rows.length - 1], destination);
         try{
-            int row1_priority = (int) table.getValueAt(table.getSelectedRow(),0);
-            int row2_priority = (int) table.getValueAt(destination,0);
-            model.setValueAt(row1_priority, destination, 0);
-            model.setValueAt(row2_priority, table.getSelectedRow(), 0);
+            int row1_priority = (int) table.getValueAt(table.getSelectedRow(), 1);
+            int row2_priority = (int) table.getValueAt(destination, 1);
+            model.setValueAt(row1_priority, destination, 1);
+            model.setValueAt(row2_priority, table.getSelectedRow(), 1);
         }catch(NumberFormatException ex)
         {
             

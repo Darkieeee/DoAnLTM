@@ -19,18 +19,23 @@ public class NhiemSacThe {
     public NhiemSacThe[] laighep(NhiemSacThe nst2)
     {
         NhiemSacThe[] con = new NhiemSacThe[2];
+        if(getGens().length != GiaiThuatDiTruyen.getNSTLength() || nst2.getGens().length != GiaiThuatDiTruyen.getNSTLength()) {
+            return null;
+        }
+        con[0] = new NhiemSacThe(GiaiThuatDiTruyen.getNSTLength());
+        con[1] = new NhiemSacThe(GiaiThuatDiTruyen.getNSTLength());
         java.util.Random rd = new java.util.Random();
         for(int i=0; i<GiaiThuatDiTruyen.getNSTLength(); i++)
         {
             boolean randbool = rd.nextBoolean();
             if(randbool)
             {
-                con[1].setValueAt(this.getValueAt(i),i);
-                con[2].setValueAt(nst2.getValueAt(i),i);
+                con[0].setValueAt(this.getValueAt(i),i);
+                con[1].setValueAt(nst2.getValueAt(i),i);
             }
             else{
-                con[1].setValueAt(nst2.getValueAt(i),i);
-                con[2].setValueAt(this.getValueAt(i),i);
+                con[0].setValueAt(nst2.getValueAt(i),i);
+                con[1].setValueAt(this.getValueAt(i),i);
             }
         }
         return con;
@@ -70,9 +75,14 @@ public class NhiemSacThe {
             }
         }
     }
-    public int[] getTKB()
+    public int[] getGens()
     {
         return gens;
+    }
+    @Override
+    public String toString()
+    {
+        return "NhiemSacThe[gens = "+java.util.Arrays.toString(gens)+",fitness = "+fitness+"]";
     }
     public static void main(String[] args)
     {
@@ -83,8 +93,11 @@ public class NhiemSacThe {
         dsMonhoc.add(new MonDangKy(4,"841048","Phân tích thiết kế HTTT"));
         Timetable table = new Timetable(Timetable.sapxepRandom,dsMonhoc);
         GiaiThuatDiTruyen.regTimetable(table);
-        NhiemSacThe nst = new NhiemSacThe(GiaiThuatDiTruyen.getNSTLength());
-        nst.sinhNgauNhien();
-        nst.doThichNghi();
+        NhiemSacThe nst1 = new NhiemSacThe(GiaiThuatDiTruyen.getNSTLength());
+        nst1.sinhNgauNhien();
+        NhiemSacThe nst2 = new NhiemSacThe(GiaiThuatDiTruyen.getNSTLength());
+        nst2.sinhNgauNhien();
+        NhiemSacThe[] con = nst1.laighep(nst2);
+        System.out.println(java.util.Arrays.toString(con));
     }
 }
