@@ -482,7 +482,7 @@ public class Main extends javax.swing.JFrame {
         });
         jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 200, 160, -1));
 
-        jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\Admin\\Downloads\\DoAnLTM\\DoAnLTM\\src\\main\\resources\\images\\1.jpg")); // NOI18N
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/1.jpg"))); // NOI18N
         jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1090, 530));
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
