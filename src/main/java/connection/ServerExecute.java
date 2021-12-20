@@ -1,4 +1,5 @@
 package connection;
+import DAO.Xampp_Connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,7 +23,11 @@ public class ServerExecute {
     public static String strPublicKey;
     public static PrivateKey privateKey;
     public static String strPrivateKey;
+    public static Xampp_Connection conn;
     public static void main(String[] args) {
+        Xampp_Connection conn = new Xampp_Connection();
+        conn.getConnectionDB();
+
         int i = 0;
         ExecutorService excutor = Executors.newCachedThreadPool();
         try {

@@ -1,6 +1,7 @@
 package userinterface;
 import classes.ImageIconConverter;
 import classes.model.ChiTietMonHoc;
+import classes.model.HocPhan;
 import components.table.AttributiveCellTableModel;
 import components.table.MultiSpanCellTable;
 import components.table.AttributiveCellRenderer;
@@ -10,16 +11,20 @@ import components.table.TableHeaderRenderer;
 import connection.ClientExecute;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.SwingWorker;
+import javax.swing.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import com.google.gson.Gson;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
 public class Main extends javax.swing.JFrame {
     private final MultiSpanCellTable tblLichhoc;
     private final ClientExecute client;
@@ -85,9 +90,14 @@ public class Main extends javax.swing.JFrame {
             tblMonhoc.setSelectionBackground(java.awt.Color.decode("#E6E6FA"));
             tblMonhoc.setSelectionForeground(java.awt.Color.BLACK);
             tblMonhoc.setBackground(java.awt.Color.WHITE);
-            
+            tblMonhoc.remove(0);
+            ((DefaultTableModel)tblMonhoc.getModel()).setNumRows(0);
         /*------------------------------------------------------------*/
-        
+
+
+
+
+
         /*-------------------Them su kien-----------------------------*/
         
             tblMonhoc.addKeyListener(new KeyListenerMoveRow(tblMonhoc));
@@ -103,7 +113,7 @@ public class Main extends javax.swing.JFrame {
                     {
                         tblLichhoc.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.HAND_CURSOR));
                     }
-                    tblLichhoc.changeSelection(rowIndex, columnIndex, false, false);                
+                   tblLichhoc.changeSelection(rowIndex, columnIndex, false, false);
                 }
             });
             tblLichhoc.addMouseListener(new java.awt.event.MouseAdapter(){
@@ -119,17 +129,76 @@ public class Main extends javax.swing.JFrame {
                 {
                     int rowIndex = tblMonhoc.rowAtPoint(e.getPoint());
                     int columnIndex = tblMonhoc.columnAtPoint(e.getPoint());
-                    tblMonhoc.changeSelection(rowIndex, columnIndex, false, false);                
+                   // tblMonhoc.changeSelection(rowIndex, columnIndex, false, false);
                 }
             });
-            tblMonhoc.addMouseListener(new java.awt.event.MouseAdapter(){
+           
+            /*tblMonhoc.addMouseListener(new java.awt.event.MouseAdapter(){
                 @Override
                 public void mouseExited(java.awt.event.MouseEvent e)
                 {
                     tblMonhoc.clearSelection();
                 }
-            });
+            });*/
     }
+
+    private void setTable(ArrayList<ChiTietMonHoc> list){
+        clearTable();
+        AttributiveCellTableModel model = (AttributiveCellTableModel) tblLichhoc.getModel();
+      //  model.setRowCount(0);
+       // model.setColumnCount(0);
+        DefaultCellAttribute cellAttr = (DefaultCellAttribute) model.getCellAttribute();
+        list.stream().map(ct -> {
+            model.setValueAt(ct, ct.getTietBatDau()-1, Integer.parseInt(ct.getThu())-2);
+            return ct;
+        }).forEachOrdered(ct -> {
+            int[] rowspan = new int[ct.getSotiet()];
+            int rowStart = ct.getTietBatDau()-1;
+            for (int i = 0; i < ct.getSotiet(); i++) {
+                rowspan[i] = rowStart;
+                rowStart++;
+            }
+            cellAttr.combine(rowspan, new int[]{Integer.parseInt(ct.getThu())-2});
+        });
+    }
+
+    private void clearTable(){
+        AttributiveCellTableModel model = (AttributiveCellTableModel) tblLichhoc.getModel();
+        DefaultCellAttribute cellAttr = (DefaultCellAttribute) model.getCellAttribute();
+        for (int i = 0; i<7; i++)
+            for (int j = 0; j<14; j++) {
+                model.setValueAt(null, j, i);
+                if(cellAttr.getSpan(j,i).length>1){
+                    cellAttr.split(j,i);
+                }
+                cellAttr.combine(new int[]{j}, new int[]{i});
+            }
+    }
+
+    private void clearList(){
+        DefaultTableModel model = (DefaultTableModel) tblMonhoc.getModel();
+        model.setRowCount(0);
+        //model.setColumnCount(0);
+    }
+
+    private static ArrayList<ChiTietMonHoc> getListCTMHFromJsonArray(JSONArray getData ){
+        ArrayList<ChiTietMonHoc> ct = new ArrayList<>();
+        if (getData != null) {
+
+            //Iterating JSON array
+            for (int i=0;i<getData.length();i++){
+
+                //Adding each element of JSON array into ArrayList
+                // System.out.println(getData.get(i));
+                Gson gson = new Gson();
+                ChiTietMonHoc ctmh = gson.fromJson(getData.get(i).toString(),ChiTietMonHoc.class);
+                System.out.println(ctmh);
+                ct.add(ctmh);
+            }
+        }
+        return ct;
+    }
+
     private void setReorderingColumn(javax.swing.JTable table, boolean allowReorder)
     {
         table.getTableHeader().setReorderingAllowed(allowReorder);
@@ -174,17 +243,14 @@ public class Main extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         lblLogout = new javax.swing.JLabel();
         lblMinimize = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         inpSubjectID = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        btnTenMonHoc = new javax.swing.JButton();
         btnMaMonHoc = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblMonhoc = new javax.swing.JTable();
-        inpSubjectName = new javax.swing.JTextField();
         btnOption2 = new javax.swing.JButton();
         btnOption3 = new javax.swing.JButton();
         btnOption4 = new javax.swing.JButton();
@@ -192,19 +258,22 @@ public class Main extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane2 = new javax.swing.JScrollPane();
         tblTiethoc = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Xếp thời khoá biểu SGU");
         setBackground(new java.awt.Color(255, 255, 255));
         setLocationByPlatform(true);
+        setMinimumSize(new java.awt.Dimension(1090, 690));
         setUndecorated(true);
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(102, 153, 204));
-        jPanel1.setPreferredSize(new java.awt.Dimension(1084, 50));
+        jPanel1.setBackground(new java.awt.Color(246, 246, 246));
+        jPanel1.setPreferredSize(new java.awt.Dimension(1084, 40));
 
         lblLogout.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/close.png"))); // NOI18N
+        lblLogout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icons8_Close_24px.png"))); // NOI18N
         lblLogout.setToolTipText("Close");
         lblLogout.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         lblLogout.setPreferredSize(new java.awt.Dimension(30, 30));
@@ -214,7 +283,8 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        lblMinimize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/minimize (2).png"))); // NOI18N
+        lblMinimize.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblMinimize.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/icons8_subtract_24px_1.png"))); // NOI18N
         lblMinimize.setToolTipText("Minimize");
         lblMinimize.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lblMinimize.setDoubleBuffered(true);
@@ -224,59 +294,70 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/unicorn.png"))); // NOI18N
+        jLabel1.setText("Chương trình sắp xếp thời khoá biểu (DEMO)");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(997, Short.MAX_VALUE)
-                .addComponent(lblMinimize, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(1, 1, 1)
-                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 757, Short.MAX_VALUE)
+                .addComponent(lblMinimize)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(5, 5, 5)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblMinimize, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(5, 5, 5))
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblMinimize, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblLogout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.NORTH);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel4.setText("Chọn môn theo tên:");
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Chọn tiêu chí TKB:");
+        jPanel3.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 128, 29));
 
         inpSubjectID.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 inpSubjectIDActionPerformed(evt);
             }
         });
+        jPanel3.add(inpSubjectID, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 40, 302, 29));
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Chọn môn theo mã:");
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel1.setText("XẾP THỜI KHÓA BIỂU");
-
-        btnTenMonHoc.setText("Chọn");
+        jPanel3.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, -1, 29));
 
         btnMaMonHoc.setText("Chọn");
+        btnMaMonHoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMaMonHocActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnMaMonHoc, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 40, -1, 29));
 
+        tblMonhoc.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         tblMonhoc.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                { new Integer(1), null, null}
+
             },
             new String [] {
-                "Độ ưu tiên", "Mã MH", "Tên môn học"
+                "STT", "Mã MH", "Tên môn học"
             }
         ) {
             Class[] types = new Class [] {
@@ -296,7 +377,19 @@ public class Main extends javax.swing.JFrame {
         });
         tblMonhoc.setRowHeight(24);
         tblMonhoc.setShowGrid(true);
+        tblMonhoc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblMonhocMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblMonhoc);
+        if (tblMonhoc.getColumnModel().getColumnCount() > 0) {
+            tblMonhoc.getColumnModel().getColumn(0).setMinWidth(4);
+            tblMonhoc.getColumnModel().getColumn(0).setPreferredWidth(6);
+            tblMonhoc.getColumnModel().getColumn(1).setPreferredWidth(3);
+        }
+
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 27, 295, 171));
 
         btnOption2.setText("Số ngày học ít nhất");
         btnOption2.addActionListener(new java.awt.event.ActionListener() {
@@ -304,8 +397,15 @@ public class Main extends javax.swing.JFrame {
                 btnOption2ActionPerformed(evt);
             }
         });
+        jPanel3.add(btnOption2, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 90, 132, 29));
 
         btnOption3.setText("Phòng học thấp nhất");
+        btnOption3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOption3ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnOption3, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 150, 29));
 
         btnOption4.setText("Xếp ngẫu nhiên");
         btnOption4.addActionListener(new java.awt.event.ActionListener() {
@@ -313,6 +413,7 @@ public class Main extends javax.swing.JFrame {
                 btnOption4ActionPerformed(evt);
             }
         });
+        jPanel3.add(btnOption4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 140, 132, 30));
 
         btnOption1.setText("Số tiết học ít nhất");
         btnOption1.addActionListener(new java.awt.event.ActionListener() {
@@ -320,9 +421,11 @@ public class Main extends javax.swing.JFrame {
                 btnOption1ActionPerformed(evt);
             }
         });
+        jPanel3.add(btnOption1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 90, 150, 30));
 
         jScrollPane3.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
         jScrollPane3.setPreferredSize(new java.awt.Dimension(600, 224));
+        jPanel3.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 240, 938, 380));
 
         jScrollPane2.setToolTipText("");
         jScrollPane2.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -367,95 +470,20 @@ public class Main extends javax.swing.JFrame {
         tblTiethoc.setShowGrid(true);
         jScrollPane2.setViewportView(tblTiethoc);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 938, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(jPanel3Layout.createSequentialGroup()
-                                        .addGap(51, 51, 51)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel2))
-                                        .addGap(5, 5, 5)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(inpSubjectID, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(inpSubjectName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(btnTenMonHoc)
-                                            .addComponent(btnMaMonHoc)))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                                .addComponent(btnOption3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(26, 26, 26))
-                                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
-                                                .addComponent(btnOption1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(btnOption2)
-                                            .addComponent(btnOption4))
-                                        .addGap(37, 37, 37)))
-                                .addGap(89, 89, 89))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
-                                .addGap(204, 204, 204)))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(110, 110, 110))))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(inpSubjectID, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnMaMonHoc, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(inpSubjectName, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnTenMonHoc, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnOption2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnOption1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(btnOption3, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(btnOption4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addGap(31, 31, 31)
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addGap(20, 20, 20)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20))
-        );
+        jPanel3.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 70, 380));
+
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/delete.png"))); // NOI18N
+        jButton1.setText("Xóa môn đang chọn");
+        jButton1.setToolTipText("");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 200, 160, -1));
+
+        jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\Admin\\Downloads\\DoAnLTM\\DoAnLTM\\src\\main\\resources\\images\\1.jpg")); // NOI18N
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1090, 530));
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -470,6 +498,7 @@ public class Main extends javax.swing.JFrame {
             client.close();
             ex.shutdown();
             dispose();
+            
         }
     }//GEN-LAST:event_lblLogoutMouseClicked
 
@@ -478,7 +507,57 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_lblMinimizeMouseClicked
 
     private void btnOption1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption1ActionPerformed
-        // TODO add your handling code here:
+        if(!client.isConnected())
+        {
+            javax.swing.JOptionPane.showMessageDialog( null,
+                    "Không thể kết nối đến server",
+                    "Chương trình",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+        else{
+            if(tblMonhoc.getRowCount()==0){
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Vui lòng chọn môn để sắp xếp",
+                        "Chương trình",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            String input = "";
+            TableModel model  = tblMonhoc.getModel();
+            int[] data = new int[tblMonhoc.getRowCount()];
+            for (int i = 0; i < tblMonhoc.getRowCount(); i++) {
+                data[i] = Integer.parseInt((String) model.getValueAt(0, 1));
+                input+= Integer.parseInt((String) model.getValueAt(i, 1))+"/";
+            }
+            System.out.println(Arrays.toString(data));
+            client.sendMessage("OPTION1;"+input);
+            LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
+            SwingWorker<String,String> worker = new SwingWorker<>(){
+                @Override
+                protected String doInBackground() throws InterruptedException {
+                    Thread.sleep(1000);
+                    return client.getMessage();
+                }
+                @Override
+                protected void done() {
+                    try {
+                        //System.out.println("What i get:" + get());
+                        String json = get();
+                        JSONArray getData = new JSONArray(json);
+                        ArrayList<ChiTietMonHoc> ct = Main.getListCTMHFromJsonArray(getData);
+                        setTable(ct);
+                        clearList();
+                        ld.setVisible(false);
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            ex.submit(worker);
+            //Loading dialog will be displayed on the screen after the button has been clicked
+            ld.setVisible(true);
+        }
     }//GEN-LAST:event_btnOption1ActionPerformed
 
     private void btnOption4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption4ActionPerformed
@@ -491,9 +570,22 @@ public class Main extends javax.swing.JFrame {
         }
 
         else{
-            String [] characters = new String[]{"a","b","c"};
-            java.util.Random rd = new java.util.Random();
-            client.sendMessage(characters[rd.nextInt(characters.length)]);
+            if(tblMonhoc.getRowCount()==0){
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Vui lòng chọn môn để sắp xếp",
+                        "Chương trình",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            String input = "";
+            TableModel model  = tblMonhoc.getModel();
+            int[] data = new int[tblMonhoc.getRowCount()];
+            for (int i = 0; i < tblMonhoc.getRowCount(); i++) {
+                data[i] = Integer.parseInt((String) model.getValueAt(0, 1));
+                input+= Integer.parseInt((String) model.getValueAt(i, 1))+"/";
+            }
+            System.out.println(Arrays.toString(data));
+            client.sendMessage("OPTION4;"+input);
             LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
             SwingWorker<String,String> worker = new SwingWorker<>(){
                 @Override
@@ -504,7 +596,12 @@ public class Main extends javax.swing.JFrame {
                 @Override
                 protected void done() {
                     try {
-                        System.out.println("What i get:" + get());
+                        //System.out.println("What i get:" + get());
+                        String json = get();
+                        JSONArray getData = new JSONArray(json);
+                        ArrayList<ChiTietMonHoc> ct = Main.getListCTMHFromJsonArray(getData);
+                        setTable(ct);
+                        clearList();
                         ld.setVisible(false);
                     } catch (InterruptedException | ExecutionException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -518,17 +615,197 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_btnOption4ActionPerformed
 
     private void btnOption2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption2ActionPerformed
-        // TODO add your handling code here:
+        if(!client.isConnected())
+        {
+            javax.swing.JOptionPane.showMessageDialog( null,
+                    "Không thể kết nối đến server",
+                    "Chương trình",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+        else{
+            if(tblMonhoc.getRowCount()==0){
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Vui lòng chọn môn để sắp xếp",
+                        "Chương trình",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            String input = "";
+            TableModel model  = tblMonhoc.getModel();
+            int[] data = new int[tblMonhoc.getRowCount()];
+            for (int i = 0; i < tblMonhoc.getRowCount(); i++) {
+                data[i] = Integer.parseInt((String) model.getValueAt(0, 1));
+                input+= Integer.parseInt((String) model.getValueAt(i, 1))+"/";
+            }
+            System.out.println(Arrays.toString(data));
+            client.sendMessage("OPTION2;"+input);
+            LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
+            SwingWorker<String,String> worker = new SwingWorker<>(){
+                @Override
+                protected String doInBackground() throws InterruptedException {
+                    Thread.sleep(1000);
+                    return client.getMessage();
+                }
+                @Override
+                protected void done() {
+                    try {
+                        //System.out.println("What i get:" + get());
+                        String json = get();
+                        JSONArray getData = new JSONArray(json);
+                        ArrayList<ChiTietMonHoc> ct = Main.getListCTMHFromJsonArray(getData);
+                        setTable(ct);
+                        clearList();
+                        ld.setVisible(false);
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            ex.submit(worker);
+            //Loading dialog will be displayed on the screen after the button has been clicked
+            ld.setVisible(true);
+        }
     }//GEN-LAST:event_btnOption2ActionPerformed
 
     private void inpSubjectIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_inpSubjectIDActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_inpSubjectIDActionPerformed
 
+    private void btnMaMonHocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaMonHocActionPerformed
+        if(inpSubjectID.toString() == null || inpSubjectID.toString().equals(""))
+        {
+            return;
+        }
+        if(client.isConnected())
+        {
+            client.sendMessage("REGISTERCOURSE;"+inpSubjectID.getText());
+            String json = client.getMessage();
+            JSONObject getData = new JSONObject(json);
+            if(getData.getBoolean("status"))
+            {
+                inpSubjectID.setText("");
+                HocPhan hocphan = new Gson().fromJson(getData.getJSONObject("hocphan").toString(),HocPhan.class);
+                System.out.println(hocphan.getMaMonHoc());
+                if (checkSubject(hocphan.getMaMonHoc())){
+                javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblMonhoc.getModel();
+                model.addRow(new Object[]{tblMonhoc.getRowCount()+1,
+                                          hocphan.getMaMonHoc(),
+                                          hocphan.getTenMonHoc()});
+
+                javax.swing.JOptionPane.showMessageDialog(null,"Chọn môn thành công","Chương trình",javax.swing.JOptionPane.PLAIN_MESSAGE);
+                }
+                else
+                    JOptionPane.showMessageDialog(this, "Môn học đã được chọn!");
+            }
+            else {
+                javax.swing.JOptionPane.showMessageDialog(null, 
+                                                          getData.get("message"),
+                                                          "Chương trình",
+                                                          javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            }
+            
+        }else{
+            javax.swing.JOptionPane.showMessageDialog(null,
+                                                      "Không thể kết nối đến server",
+                                                      "Chương trình",
+                                                      javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnMaMonHocActionPerformed
+
+    private void btnOption3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOption3ActionPerformed
+        if(!client.isConnected())
+        {
+            javax.swing.JOptionPane.showMessageDialog( null,
+                    "Không thể kết nối đến server",
+                    "Chương trình",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+
+        else{
+            if(tblMonhoc.getRowCount()==0){
+                javax.swing.JOptionPane.showMessageDialog(null,
+                        "Vui lòng chọn môn để sắp xếp",
+                        "Chương trình",
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            String input = "";
+            TableModel model  = tblMonhoc.getModel();
+            int[] data = new int[tblMonhoc.getRowCount()];
+            for (int i = 0; i < tblMonhoc.getRowCount(); i++) {
+                data[i] = Integer.parseInt((String) model.getValueAt(0, 1));
+                input+= Integer.parseInt((String) model.getValueAt(i, 1))+"/";
+            }
+            System.out.println(Arrays.toString(data));
+            client.sendMessage("OPTION3;"+input);
+            LoadingDialog ld = new LoadingDialog(this, "Đang xếp thời khoá biểu. Chờ tí nhé!!!", "src/main/resources/images/loading.gif");
+            SwingWorker<String,String> worker = new SwingWorker<>(){
+                @Override
+                protected String doInBackground() throws InterruptedException {
+                    Thread.sleep(1000);
+                    return client.getMessage();
+                }
+                @Override
+                protected void done() {
+                    try {
+                        //System.out.println("What i get:" + get());
+                        String json = get();
+                        JSONArray getData = new JSONArray(json);
+                        ArrayList<ChiTietMonHoc> ct = Main.getListCTMHFromJsonArray(getData);
+                        setTable(ct);
+                        clearList();
+                        ld.setVisible(false);
+                    } catch (InterruptedException | ExecutionException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            ex.submit(worker);
+            //Loading dialog will be displayed on the screen after the button has been clicked
+            ld.setVisible(true);
+        }
+    }//GEN-LAST:event_btnOption3ActionPerformed
+
+    private void tblMonhocMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblMonhocMouseClicked
+       
+    }//GEN-LAST:event_tblMonhocMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                                                   
+        System.out.print(tblMonhoc.getSelectedRow());
+        int index = tblMonhoc.getSelectedRow();
+        if(index==-1){
+            javax.swing.JOptionPane.showMessageDialog(null,"Vui lòng chọn hàng cần xoá","Chương trình",javax.swing.JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
+        DefaultTableModel model = (DefaultTableModel) tblMonhoc.getModel();
+        System.out.println(model.getValueAt(index,2));
+
+        for(int i= index; i<tblMonhoc.getRowCount() - 1; i++){
+            String mamh = (String) model.getValueAt(i+1, 1);
+            String tenmh = (String) model.getValueAt(i+1, 2);
+            model.setValueAt(mamh, i, 1);
+            model.setValueAt(tenmh, i, 2);
+
+        }
+        model.setRowCount(model.getRowCount()-1);
+
+    }                                        
+    public boolean checkSubject(String mmh) {
+        boolean kt=true;
+        int size = tblMonhoc.getRowCount();
+        for (int i = 0; i< size; i++){
+                    if (tblMonhoc.getValueAt(i,1).toString().equals(mmh)){
+                           kt=false;
+                           break;
+                    }
+                }
+        return kt;
+    }
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String... args) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -563,13 +840,12 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JButton btnOption2;
     private javax.swing.JButton btnOption3;
     private javax.swing.JButton btnOption4;
-    private javax.swing.JButton btnTenMonHoc;
     private javax.swing.JTextField inpSubjectID;
-    private javax.swing.JTextField inpSubjectName;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;

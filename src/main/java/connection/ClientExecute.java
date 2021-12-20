@@ -1,10 +1,8 @@
 package connection;
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
+import javax.crypto.*;
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -41,8 +39,8 @@ public class ClientExecute {
         try {
             socket = new Socket(host,port);
             System.out.println("Client connected");
-            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
 //            ExecutorService executor = Executors.newCachedThreadPool();
             String data = in.readLine(); //read data public key from server
             strPublicKey = data;
@@ -91,8 +89,12 @@ public class ClientExecute {
     {
         try{
             String cipherData = in.readLine();
-            return Encryption.decryptData(sessionKey, cipherData);
+            System.out.println("cipher = " + cipherData);
+            String original = Encryption.decryptData(sessionKey, cipherData);
+            System.out.println(original);
+            return original;
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | IOException ex) {
+            ex.printStackTrace();
             return null;
         }
     }

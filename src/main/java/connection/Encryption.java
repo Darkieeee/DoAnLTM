@@ -1,4 +1,5 @@
 package connection;
+import java.nio.charset.StandardCharsets;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.*;
@@ -14,7 +15,7 @@ public class Encryption {
     public static String encryptData(SecretKey secretKey, String data) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] byteEncrypted = cipher.doFinal(data.getBytes());
+        byte[] byteEncrypted = cipher.doFinal(data.getBytes(StandardCharsets.UTF_8));
         String encrypted =  Base64.getEncoder().encodeToString(byteEncrypted);
         return encrypted;
     }
@@ -23,7 +24,7 @@ public class Encryption {
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] byteDecrypted = cipher.doFinal(Base64.getDecoder().decode(data));
-        String decrypted = new String(byteDecrypted);
+        String decrypted = new String(byteDecrypted, StandardCharsets.UTF_8);
         return decrypted;
     }
 

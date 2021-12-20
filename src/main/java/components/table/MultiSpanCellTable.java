@@ -106,7 +106,7 @@ public class MultiSpanCellTable extends JTable {
             }
         };
         tip.setPreferredSize(new java.awt.Dimension(350,200));
-        tip.setBackground(new java.awt.Color(1.0f, 1.0f, 1.0f, 0.0f));
+        tip.setBackground(new java.awt.Color(0.5f, 0.5f, 0.5f, 0.0f));
         tip.setOpaque(false);
         return tip;
     }
